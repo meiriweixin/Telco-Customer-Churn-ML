@@ -2,7 +2,8 @@ name: Build and Push to Docker Hub
 
 on:
   push:
-    branches: [main]  # Only trigger on main branch pushes
+    branches: [main]  # Trigger on main branch pushes
+  workflow_dispatch:   # Also allow manual runs from the Actions tab
 
 jobs:
   build-and-push:
