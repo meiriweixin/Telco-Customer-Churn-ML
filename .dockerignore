@@ -1,2 +1,16 @@
 data/
 notebooks/
+
+# Local MLflow runs are not needed in the image; the serving model is copied
+# explicitly from src/serving/model in the Dockerfile.
+mlruns/
+artifacts/
+
+# Dev / VCS / cache junk
+.git/
+.github/
+.gradio/
+.venv/
+**/__pycache__/
+*.pyc
+.DS_Store
