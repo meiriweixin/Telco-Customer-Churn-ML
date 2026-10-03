@@ -1,16 +1,24 @@
 #!/usr/bin/env python3
 """
-Runs sequentially: load → validate → preprocess → feature engineering
+Runs sequentially: load → validate → preprocess → feature engineering → modeling → hyperparameter
 """
 
 import os
 import sys
+
+# Ensure UTF-8 output so emoji/arrows in logs don't crash on Windows consoles
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+except AttributeError:
+    pass
+
 import time
 import argparse
+from pathlib import Path
 import pandas as pd
 import mlflow
 import mlflow.sklearn
-from posthog import project_root
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import (
     classification_report, precision_score, recall_score,
@@ -37,7 +45,11 @@ def main(args):
     # === MLflow Setup - ESSENTIAL for experiment tracking ===
     # Configure MLflow to use local file-based tracking (not a tracking server)
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    mlruns_path = args.mlflow_uri or f"file://{project_root}/mlruns"  # Local file-based tracking
+    # Build a proper file URI so it works cross-platform. On Windows a plain path
+    # like "C:\...\mlruns" makes MLflow read the drive letter "C" as a URI scheme,
+    # and "file://C:\..." is also rejected; Path.as_uri() yields a valid
+    # "file:///C:/.../mlruns" on Windows and "file:///.../mlruns" on POSIX.
+    mlruns_path = args.mlflow_uri or Path(project_root, "mlruns").as_uri()
     mlflow.set_tracking_uri(mlruns_path)
     mlflow.set_experiment(args.experiment)  # Creates experiment if doesn't exist
 
@@ -232,10 +244,10 @@ if __name__ == "__main__":
     args = p.parse_args()
     main(args)
 
-"""
+r"""
 # Use this below to run the pipeline:
 
-python scripts/run_pipeline.py \                                            
+python scripts/run_pipeline.py \
     --input data/raw/Telco-Customer-Churn.csv \
     --target Churn
 

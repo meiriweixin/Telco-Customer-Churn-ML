@@ -1,3 +1,12 @@
+import sys
+
+# Ensure UTF-8 output so emoji/arrows in logs don't crash on Windows consoles
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+except AttributeError:
+    pass
+
 import requests
 
 url = "http://127.0.0.1:8000/predict"

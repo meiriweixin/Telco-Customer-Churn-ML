@@ -4,14 +4,24 @@ import pandas as pd
 
 # Make sure Python can find your src package
 import sys
-sys.path.append(os.path.abspath("src"))
+
+# Ensure UTF-8 output so emoji/arrows in logs don't crash on Windows consoles
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+except AttributeError:
+    pass
+
+# Resolve the project root from this file's location (scripts/ -> project root)
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(PROJECT_ROOT, "src"))
 
 from data.load_data import load_data
 from data.preprocess import preprocess_data
 from features.build_features import build_features
 
 # === CONFIG ===
-DATA_PATH = "/Users/riadanas/Desktop/Telco Customer Churn MLE/data/raw/Telco-Customer-Churn.csv"  # adjust to your file path
+DATA_PATH = os.path.join(PROJECT_ROOT, "data", "raw", "Telco-Customer-Churn.csv")
 TARGET_COL = "Churn"
 
 def main():
