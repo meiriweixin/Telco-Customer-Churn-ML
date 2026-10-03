@@ -8,8 +8,14 @@ WORKDIR /app
 COPY requirements.txt .
 
 # 4. Install Python dependencies (add curl if you use MLflow local tracking URI)
+# NOTE: --trusted-host is needed when building behind a corporate proxy / VPN that
+# performs SSL inspection (the slim image doesn't trust the corporate root CA, which
+# causes "CERTIFICATE_VERIFY_FAILED"). It is harmless on networks without inspection
+# (e.g. GitHub Actions). For a stricter build, embed the corporate CA instead.
 RUN pip install --upgrade pip \
+      --trusted-host pypi.org --trusted-host files.pythonhosted.org \
     && pip install -r requirements.txt \
+      --trusted-host pypi.org --trusted-host files.pythonhosted.org \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 5. Copy the entire project into the image
